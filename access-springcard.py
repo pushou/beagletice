@@ -50,7 +50,7 @@ def getAccessId(myevent):
     else:
        code = myevent[4:]
        t=qwertyToAzerty(code)
-       #print("myevent:{} code:{} extract:{}".format(myevent,code,t))
+       print("myevent:{} code:{} extract:{}".format(myevent,code,t))
        return(t)
     
 
@@ -121,7 +121,7 @@ if __name__ == "__main__":
             data = categorize(event)
             if data.keystate == 1:
                key_lookup = ecodes.KEY.get(data.scancode)
-               if key_lookup != "KEY_LEFTSHIFT":
+               if key_lookup != "KEY_LEFTSHIFT" and key_lookup != "KEY_CAPSLOCK" :
                   rfidcar=getAccessId(key_lookup)
                   # Rupture sur une la touche ENTER et le code 28 qui caracterise la fin de l'envoi du RFID par 'le prox n roll'
                   if rfidcar and rfidcar != 'FINSEQ':
