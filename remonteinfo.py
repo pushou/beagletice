@@ -49,13 +49,17 @@ def readEvent(rfid):
     reqsql="SELECT * FROM RfidTrace  where traite=0 and rfid={}".format(rfid)
     return execSql(req)
     
-def remonteVersBase(action,*rfid):
+def remonteVersTiceServer(action,*rfid):
     print(action,*rfid)
     key = paramiko.RSAKey.from_private_key_file("id_rsa.conftice")
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     print("connecting")
     ssh.connect(hostname = 'my.conftice.org', username = 'beagle', pkey = key)
+    stdin, stdout, stderr = ssh.exec_command("ip a")
+    stdin.flush()
+    data = stdout.read.splitlines()
+    print(data)
 
 if __name__ == "__main__":
 
@@ -67,6 +71,7 @@ if __name__ == "__main__":
     print("like events")
     for like_event in readLikeEvents() :
 	print(like_event)
+
     print('#' * 50)
     print("meet events")
     for meet_event in readMeetEvents():
