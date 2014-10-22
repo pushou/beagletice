@@ -3,7 +3,6 @@
 Oct  2014
 @author: pushou
 push to tice server
-RfidTrace(p_ID INTEGER PRIMARY KEY AUTOINCREMENT,eventdate DATETIME default current_timestamp, Machine TEXT,Rfid TEXT ,compteur INTEGER, traite BOOLEAN)
 """
 from __future__ import print_function, division
 from datetime import datetime
@@ -49,21 +48,29 @@ def readEvent(rfid):
     reqsql="SELECT * FROM RfidTrace  where traite=0 and rfid={}".format(rfid)
     return execSql(req)
     
-def remonteVersTiceServer(action,*rfid):
-    print(action,*rfid)
-    key = paramiko.RSAKey.from_private_key_file("id_rsa.conftice")
+def remonteVersTiceServer(action):
+    print(action)
+    key = paramiko.RSAKey.from_private_key_file(rsakey)
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     print("connecting")
-    ssh.connect(hostname = 'my.conftice.org', username = 'beagle', pkey = key)
-    stdin, stdout, stderr = ssh.exec_command("ip a")
-    stdin.flush()
-    data = stdout.read.splitlines()
-    print(data)
+    ssh.connect(hostname = ticeserver, username = username, pkey = key)
+    stdin, stdout, stderr = ssh.exec_command(action)
+    #stdin.flush()
+    #data = stdout.read.splitlines()
+    print(stdout.readlines())
 
 if __name__ == "__main__":
 
-    previousnumber=0
+    rsakey='/home/pouchou/id_rsa.conftice'
+    ticeserver='my.ticeconf.org'
+    username='beagle'
+    fmt = "%Y-%m-%dT%X%z"
+
+    now_utc = datetime.now(timezone('UTC'))
+    # Europe/Paris time zone
+    now_paris = now_utc.astimezone(timezone('Europe/Paris'))
+
     print("here events")
     for here_event in readHereEvents():
 	print(here_event)
@@ -82,17 +89,34 @@ if __name__ == "__main__":
 	print(all_event)
     print('#' * 50)
 
-
-	#if len(event[1].split(',')) == 1:
-  	#     print("j'aime de {}".format(event[1]))
-        #     remonteVersBase('php prod/test.php',event[1])	
-	#else:
-	#     # 
-	#     pc = getPreviousCompteur(event[0])
-        #     if pc:
-  	#         print("je suis venu ici  de {}".format(event[1]))
-	#     else:
-  	#         print("nous avons eu un contact√s  {}".format(event[1]))
-        #print(event)
+    dateheure=now_paris.strftime(fmt)
+    #remonteVersTiceServer('php prod/test.php False;echo $?',rsakey,readHereEvents())
+    #remonteVersTiceServer('php prod/test.php True;echo $?',rsakey,readHereEvents())
+    for group_of_meetrfids in readMeetEvents():
+        #print(group_of_meetrfids[1])
+        #print('%' * 50)
+        rfidlist = ' '.join(group_of_meetrfids[1].split(','))
+        #print(rfidlist)
+        pushcommand="php prod/link.php {} {} ".format(dateheure,rfidlist)
+        print(pushcommand)
+        remonteVersTiceServer(pushcommand)
+    
        
+    for group_of_likerfids in readLikeEvents():
+        group_of_likerfids=list(group_of_likerfids)
+        machine=group_of_likerfids[2]
+        rfid=group_of_likerfids[3]
+        #print(machine,rfid)
+        pushcommand="php prod/join-like.php like {} {} {} ".format(dateheure,machine,rfid)
+        print(pushcommand)
+        remonteVersTiceServer(pushcommand)
+
+    for group_of_hererfids in readHereEvents():
+        group_of_hererfids=list(group_of_hererfids)
+        machine=group_of_likerfids[2]
+        rfid=group_of_likerfids[3]
+        #print(machine,rfid)
+        pushcommand="php prod/join-like.php join {} {} {} ".format(dateheure,machine,rfid)
+        print(pushcommand)
+        remonteVersTiceServer(pushcommand)
 
