@@ -20,6 +20,7 @@ def execSql(reqsql):
         cur = conn.cursor()
 	print(reqsql)
 	cur.execute(reqsql)
+        conn.commit()
         return(cur.fetchall())
     except lite.Error, e:
         print("Erreur {}:".format(e.args[0]))
@@ -43,11 +44,14 @@ def readMeetEvents():
 where traite={} and etat={}  GROUP BY compteur".format(0,2)
     return execSql(req)
 
-
 def readEvent(rfid):
-    reqsql="SELECT * FROM RfidTrace  where traite=0 and rfid={}".format(rfid)
+    req="SELECT * FROM RfidTrace  where traite=0 and rfid={}".format(rfid)
     return execSql(req)
     
+def modifyEvent(rfid):
+    req="UPDATE RfidTrace SET traite={} where Rfid='{}'".format(1,unicode(rfid))
+    return execSql(req)
+
 def remonteVersTiceServer(action):
     print(action)
     key = paramiko.RSAKey.from_private_key_file(rsakey)
@@ -59,6 +63,8 @@ def remonteVersTiceServer(action):
     #stdin.flush()
     #data = stdout.read.splitlines()
     print(stdout.readlines())
+ 
+
 
 if __name__ == "__main__":
 
@@ -99,7 +105,9 @@ if __name__ == "__main__":
         #print(rfidlist)
         pushcommand="php prod/link.php {} {} ".format(dateheure,rfidlist)
         print(pushcommand)
-        remonteVersTiceServer(pushcommand)
+        #remonteVersTiceServer(pushcommand)
+        for rfid in group_of_meetrfids:
+            print(rfid)
     
        
     for group_of_likerfids in readLikeEvents():
@@ -109,14 +117,16 @@ if __name__ == "__main__":
         #print(machine,rfid)
         pushcommand="php prod/join-like.php like {} {} {} ".format(dateheure,machine,rfid)
         print(pushcommand)
-        remonteVersTiceServer(pushcommand)
+        #remonteVersTiceServer(pushcommand)
+        modifyEvent(rfid)
 
     for group_of_hererfids in readHereEvents():
         group_of_hererfids=list(group_of_hererfids)
-        machine=group_of_likerfids[2]
-        rfid=group_of_likerfids[3]
+        machine=group_of_hererfids[2]
+        rfid=group_of_hererfids[3]
         #print(machine,rfid)
         pushcommand="php prod/join-like.php join {} {} {} ".format(dateheure,machine,rfid)
         print(pushcommand)
-        remonteVersTiceServer(pushcommand)
+        #remonteVersTiceServer(pushcommand)
+        modifyEvent(rfid)
 
