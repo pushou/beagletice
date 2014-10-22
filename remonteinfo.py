@@ -105,7 +105,7 @@ if __name__ == "__main__":
         #print(rfidlist)
         pushcommand="php prod/link.php {} {} ".format(dateheure,rfidlist)
         print(pushcommand)
-        #remonteVersTiceServer(pushcommand)
+        remonteVersTiceServer(pushcommand)
         for rfid in group_of_meetrfids:
             print(rfid)
     
@@ -117,7 +117,7 @@ if __name__ == "__main__":
         #print(machine,rfid)
         pushcommand="php prod/join-like.php like {} {} {} ".format(dateheure,machine,rfid)
         print(pushcommand)
-        #remonteVersTiceServer(pushcommand)
+        remonteVersTiceServer(pushcommand)
         modifyEvent(rfid)
 
     for group_of_hererfids in readHereEvents():
@@ -127,6 +127,6 @@ if __name__ == "__main__":
         #print(machine,rfid)
         pushcommand="php prod/join-like.php join {} {} {} ".format(dateheure,machine,rfid)
         print(pushcommand)
-        #remonteVersTiceServer(pushcommand)
+        remonteVersTiceServer(pushcommand)
         modifyEvent(rfid)
 
