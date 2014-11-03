@@ -113,8 +113,8 @@ if __name__ == "__main__":
     for dev in devices:
        print(dev)
     try:	
-        dev=InputDevice('/dev/input/event0')
-	print("reading /dev/input/event0")
+        dev=InputDevice('/dev/input/event1')
+	print("reading /dev/input/event1")
     except OSError:
 	print("pas de prox-n-roll")
 	sys.exit()
