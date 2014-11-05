@@ -1,0 +1,99 @@
+---
+- hosts: bb
+  remote_user: root
+  sudo: yes
+  gather_facts: no
+  vars:
+   locale: fr_FR.UTF-8
+   timezone: Europe/Paris
+
+  tasks:
+
+    - name: mis a jour apt-get update et upgrade 
+      apt: upgrade=dist
+
+    - name: copy /etc/init.d/led_aging.sh
+      copy: src=led_aging.sh dest=/etc/init.d/led_aging.sh owner=root group=root mode=0755
+
+    - name: install package
+      action: apt pkg={{item}} state=latest update_cache=yes
+      with_items:
+       - build-essential
+       - python-dev
+       - python-setuptools
+       - python-pip
+       - python-smbus
+       - ca-certificates
+       - tmux
+       - ntp
+       - git
+       - systemd
+      tags: sysnmod
+
+    - name: installation des modules pythons
+      action: pip name={{item}} state=latest   
+      with_items:
+       - Adafruit_BBIO 
+       - pytz
+       - circus
+       - paramiko
+      tags: pythonmod
+
+    
+    - name: Creation des directory
+      file: path={{item}} state=directory
+      with_items:
+       - /etc/circus
+       - /home/bin
+
+    - name: Deploiement du code Python 
+      action: git repo=https://github.com/pushou/beagletice.git dest=/home/bin/beagletice
+      tags: codepython
+
+
+    - name: systemctl , runlevel3
+      command: systemctl enable {{item}}
+      with_items:
+       - multi-user.target 
+       - circus.service
+      tags: systemd
+
+    - name: restart circus
+      command: systemctl restart circus.service
+      notify: update tzdata
+      tags: systemd
+
+#####################################
+
+    - name: copy circus service to /lib/systemd/system/circus.service
+      command: cp /home/bin/beagletice/circus.service  /lib/systemd/system/circus.service 
+      tags: circus
+     
+    - name: copy circus.ini to /etc/circus
+      command: cp /home/bin/beagletice/circus.ini  /etc/circus/circus.ini 
+      tags: circus
+
+#####################################
+   
+    - name: set locale et timezone
+      command: /usr/sbin/update-locale LANG={{ locale }} LC_ALL=$locale
+      tags: timezone
+
+    - name: set /etc/localtime
+      file: src=/usr/share/zoneinfo/{{timezone}} dest=/etc/localtime state=link force=yes
+      tags: timezone
+
+    - name: set /etc/timezone
+      template: src=template_timezone dest=/etc/timezone
+      notify: update tzdata
+      tags: timezone
+
+    - name: cron du push vers TICE
+      cron: name="push vers TICE"  minute="*/1"   job="/home/bin/beagletice/remonteinfo.py 2>&1 > /dev/null"
+      tags: cron
+
+  handlers:
+    - name: update tzdata
+      command: /usr/sbin/dpkg-reconfigure --frontend noninteractive tzdata
+    - name: daemon restart
+      command: systemctl --system daemon-reload
