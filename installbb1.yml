@@ -9,11 +9,13 @@
 
   tasks:
 
-    - name: mis a jour apt-get update et upgrade 
-      apt: upgrade=dist
 
     - name: copy /etc/init.d/led_aging.sh
       copy: src=led_aging.sh dest=/etc/init.d/led_aging.sh owner=root group=root mode=0755
+
+    - name: mis a jour apt-get update et upgrade 
+      command: /usr/bin/apt-get -y dist-upgrade
+      tags: apt
 
     - name: install package
       action: apt pkg={{item}} state=latest update_cache=yes
@@ -45,6 +47,7 @@
       with_items:
        - /etc/circus
        - /home/bin
+      tags: dir
 
     - name: Deploiement du code Python 
       action: git repo=https://github.com/pushou/beagletice.git dest=/home/bin/beagletice
@@ -65,18 +68,22 @@
 
 #####################################
 
-    - name: copy circus service to /lib/systemd/system/circus.service
-      command: cp /home/bin/beagletice/circus.service  /lib/systemd/system/circus.service 
+    - name: copy ./beagletice/circus service to /lib/systemd/system/circus.service
+      copy: src=./beagletice/circus.service dest=/lib/systemd/system/circus.service
       tags: circus
      
-    - name: copy circus.ini to /etc/circus
-      command: cp /home/bin/beagletice/circus.ini  /etc/circus/circus.ini 
+    - name: copy ./beagletice/circus.ini to /etc/circus
+      copy: src=./beagletice/circus.ini dest=/etc/circus/circus.ini
       tags: circus
 
 #####################################
    
-    - name: set locale et timezone
-      command: /usr/sbin/update-locale LANG={{ locale }} LC_ALL=$locale
+    - name: gen locale
+      copy: src=./beagletice/locale dest=/etc/default/locale
+      tags: timezone
+
+    - name: gen locale
+      command: /usr/sbin/dpkg-reconfigure --frontend noninteractive locales
       tags: timezone
 
     - name: set /etc/localtime
