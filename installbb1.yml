@@ -6,9 +6,13 @@
   vars:
    locale: fr_FR.UTF-8
    timezone: Europe/Paris
+   hostname: bb2
 
   tasks:
 
+    - name: set /etc/hostname
+      template: src=./beagletice/hostname dest=/etc/hostname
+      tags: hostname
 
     - name: copy /etc/init.d/led_aging.sh
       copy: src=led_aging.sh dest=/etc/init.d/led_aging.sh owner=root group=root mode=0755
@@ -39,6 +43,7 @@
        - pytz
        - circus
        - paramiko
+       - evdev
       tags: pythonmod
 
     
