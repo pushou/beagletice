@@ -1,5 +1,5 @@
 ---
-- hosts: bb
+- hosts: bb2
   remote_user: root
   sudo: yes
   gather_facts: no
@@ -15,7 +15,15 @@
       tags: hostname
 
     - name: copy /etc/init.d/led_aging.sh
-      copy: src=led_aging.sh dest=/etc/init.d/led_aging.sh owner=root group=root mode=0755
+      copy: src=./beagletice/led_aging.sh dest=/etc/init.d/led_aging.sh owner=root group=root mode=0755
+
+    - name: copy rsa
+      copy: src=id_rsa dest=/home/pouchou/id_rsa.conftice owner=root group=root mode=0600
+      tags: ssh
+
+    - name: copy wifi interface 
+      template: src=./beagletice/wifi dest=/etc/network/interfaces
+      tags: ssh
 
     - name: mis a jour apt-get update et upgrade 
       command: /usr/bin/apt-get -y dist-upgrade
@@ -34,7 +42,14 @@
        - ntp
        - git
        - systemd
+       - check-mk-agent
       tags: sysnmod
+
+    - name: sed 
+      lineinfile: dest=/etc/xinetd.d/check_mk
+                regexp='disable'
+                line='        disable        = no'
+      tags: xinetd
 
     - name: installation des modules pythons
       action: pip name={{item}} state=latest   

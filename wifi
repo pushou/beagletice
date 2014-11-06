@@ -1,0 +1,9 @@
+# WiFi IOE TICE
+auto wlan0
+iface wlan0 inet static
+    wpa-ssid "IOETICE"
+    wpa-psk  "Tice2014"
+    address 172.31.128.2
+    netmask 255.255.128.0
+    gateway 172.31.128.255
+    dns-nameservers 194.199.227.53 194.199.227.54
