@@ -1,12 +1,12 @@
 ---
-- hosts: bb2
+- hosts: bb1
   remote_user: root
   sudo: yes
   gather_facts: no
   vars:
    locale: fr_FR.UTF-8
    timezone: Europe/Paris
-   hostname: bb2
+   hostname: bb1
 
   tasks:
 
