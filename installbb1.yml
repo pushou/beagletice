@@ -25,6 +25,10 @@
       template: src=./beagletice/wifi dest=/etc/network/interfaces
       tags: ssh
 
+    - name: copy  resolvconf
+      template: src=./beagletice/resolvconf dest=/etc/resolv.conf
+      tags:resolv 
+
     - name: mis a jour apt-get update et upgrade 
       command: /usr/bin/apt-get -y dist-upgrade
       tags: apt
@@ -73,6 +77,13 @@
       action: git repo=https://github.com/pushou/beagletice.git dest=/home/bin/beagletice
       tags: codepython
 
+    - name: copy ./beagletice/circus service to /lib/systemd/system/circus.service
+      copy: src=./beagletice/circus.service dest=/lib/systemd/system/circus.service
+      tags: circus
+
+    - name: copy ./beagletice/circus.ini to /etc/circus
+      copy: src=./beagletice/circus.ini dest=/etc/circus/circus.ini
+      tags: circus
 
     - name: systemctl , runlevel3
       command: systemctl enable {{item}}
@@ -86,15 +97,7 @@
       notify: update tzdata
       tags: systemd
 
-#####################################
-
-    - name: copy ./beagletice/circus service to /lib/systemd/system/circus.service
-      copy: src=./beagletice/circus.service dest=/lib/systemd/system/circus.service
-      tags: circus
      
-    - name: copy ./beagletice/circus.ini to /etc/circus
-      copy: src=./beagletice/circus.ini dest=/etc/circus/circus.ini
-      tags: circus
 
 #####################################
    
@@ -111,7 +114,7 @@
       tags: timezone
 
     - name: set /etc/timezone
-      template: src=template_timezone dest=/etc/timezone
+      template: src=./beagletice/template_timezone dest=/etc/timezone
       notify: update tzdata
       tags: timezone
 
