@@ -27,7 +27,7 @@
 
     - name: copy  resolvconf
       template: src=./beagletice/resolvconf dest=/etc/resolv.conf
-      tags:resolv 
+      tags: resolv 
 
     - name: mis a jour apt-get update et upgrade 
       command: /usr/bin/apt-get -y dist-upgrade
@@ -119,7 +119,7 @@
       tags: timezone
 
     - name: cron du push vers TICE
-      cron: name="push vers TICE"  minute="*/1"   job="/home/bin/beagletice/remonteinfo.py 2>&1 > /dev/null"
+      cron: name="push vers TICE"  minute="*/3"   job="/home/bin/beagletice/remonteinfo.py 2>&1 > /dev/null"
       tags: cron
 
   handlers:
