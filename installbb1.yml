@@ -1,12 +1,13 @@
 ---
-- hosts: bb1
+- hosts: bb2
   remote_user: root
   sudo: yes
   gather_facts: no
   vars:
    locale: fr_FR.UTF-8
    timezone: Europe/Paris
-   hostname: bb1
+   hostname: bb2
+   ipaddr: 172.31.128.2
 
   tasks:
 
