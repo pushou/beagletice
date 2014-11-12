@@ -40,6 +40,9 @@ old_switch_state_12 = 0
 old_switch_state_13 = 0
 eteintLed()
 shared = memcache.Client(['127.0.0.1:11211'], debug=0)    
+etat=0
+with  open('compteur.pkl', 'wb') as pkl_file:
+  	pickle.dump({"compteur":compteur,"etat":etat},pkl_file)
 
 print('compteur: {} etat: {}'.format(compteur,etat))
 
@@ -83,6 +86,8 @@ try:
             eteintLed()
             shared.set('eteint', False)
             etat=0
+    	    with  open('compteur.pkl', 'wb') as pkl_file:
+    		pickle.dump({"compteur":compteur,"etat":etat},pkl_file)
          
         time.sleep(0.1)
      

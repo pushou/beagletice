@@ -1,8 +1,8 @@
 (dp1
 S'etat'
 p2
-I1
+I0
 sS'compteur'
 p3
-I8
+I11
 s.
