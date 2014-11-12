@@ -48,6 +48,8 @@
        - git
        - systemd
        - check-mk-agent
+       - memcached
+       - python-memcache
       tags: sysnmod
 
     - name: sed 

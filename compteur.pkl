@@ -1,0 +1,8 @@
+(dp1
+S'etat'
+p2
+I1
+sS'compteur'
+p3
+I2
+s.

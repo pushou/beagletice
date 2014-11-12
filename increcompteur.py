@@ -6,6 +6,7 @@ Oct  2014
 from __future__ import print_function, division
 import Adafruit_BBIO.GPIO as GPIO
 import time
+import memcache
 
 try:
    import cPickle as pickle
@@ -38,6 +39,7 @@ except IOError:
 old_switch_state_12 = 0
 old_switch_state_13 = 0
 eteintLed()
+shared = memcache.Client(['127.0.0.1:11211'], debug=0)    
 
 print('compteur: {} etat: {}'.format(compteur,etat))
 
@@ -76,6 +78,11 @@ try:
     	    with  open('compteur.pkl', 'wb') as pkl_file:
     	        pickle.dump({"compteur":compteur,"etat":etat},pkl_file)
         old_switch_state_13 = new_switch_state_13
+
+	if shared.get('eteint'):
+            eteintLed()
+            shared.set('eteint', False)
+            etat=0
          
         time.sleep(0.1)
      

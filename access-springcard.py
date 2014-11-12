@@ -8,6 +8,7 @@ from __future__ import print_function, division
 from evdev import InputDevice, categorize, ecodes, list_devices
 from datetime import datetime
 import Adafruit_BBIO.GPIO as GPIO
+import memcache
 
 import re
 import os
@@ -29,32 +30,28 @@ import sqlite3 as lite
 
 def qwertyToAzerty(lettre):
 	" simple transformation QWERTY 2 AZERTY due au renvoi en QWERTY du RFID"
-	return(lettre.replace("Q","A").replace('W','Z').replace('Z','W'))
+        #print(lettre)
+        Q_to_A = {
+    	'A': 'Q',
+    	'Q': 'A',
+    	'Z': 'W',
+    	'W': 'Z',
+	}
+        try:
+           return Q_to_A[lettre]
+        except KeyError:
+           return(lettre)
 
 
 def getAccessId(myevent):
     """ lecture de chaque caractere renvoye par le pseudo-ckavier du rfid :'code', 'sec', 'timestamp', 'type', 'usec', 'value'"""
-    finsec='FINSEQ'
-    kc=ecodes.KEY[myevent.code]
-    value=myevent.value
-    #print(categorize(event))
-    if myevent.code == 28:
-	    return(finsec)
-    try:
-        touche=pattern.finditer(kc)
-        t=[x.group() for x in touche][0].strip('KEY_')
-        #print("keycode:{} extract:{} value:{}".format(kc,t,value))
-	if value == 1 and t:
-	        t=qwertyToAzerty(t)
-        	#print("keycode:{} extract:{} value:{}".format(kc,t,value))
-        	if t:
-		#	print("keycode:{} extract:{} value:{} timestamp:{}".format(kc,t,value))
-            		return(t)
-        	else:
-			pass
-            		#print(print(categorize(myevent)))
-    except IndexError:
-        pass
+    if myevent == "KEY_ENTER":
+       return('FINSEQ')
+    else:
+       code = myevent[4:]
+       t=qwertyToAzerty(code)
+       #print("myevent:{} code:{} extract:{}".format(myevent,code,t))
+       return(t)
     
 
 def storeRfid(rfid):
@@ -84,14 +81,8 @@ def storeRfid(rfid):
            
         cur.execute("INSERT INTO RfidTrace VALUES(NULL,?, ?, ?, ?, ?, ?)", params)
 	conn.commit()
-	#if etat == 1:
-	#	eteintLed()
-	#	with  open('compteur.pkl', 'wb') as pkl_file:
-	#		compteur=+1
-	#		print(compteur)
-	#		etat=0
-	#		print(etat)
-	#		pickle.dump({"compteur":compteur,"etat":etat},pkl_file)
+	if etat == 1:
+                shared.set('eteint', True)
 
 	#cur.execute("select * from RfidTrace")
 	#print([c for c in cur.fetchall()])
@@ -103,6 +94,7 @@ if __name__ == "__main__":
     pattern_entrer=re.compile('KEY_ENTER$',re.UNICODE)
     machine=os.uname()[1]
 
+    shared = memcache.Client(['127.0.0.1:11211'], debug=0) 
     database = 'rfid.db'
     conn = lite.connect(database)
     cur = conn.cursor()
@@ -126,12 +118,16 @@ if __name__ == "__main__":
     liste_rfidcar=list()
     for event in dev.read_loop():
         if event.type == ecodes.EV_KEY:
-            rfidcar=getAccessId(event)
-            # Rupture sur une la touche ENTER et le code 28 qui caracterise la fin de l'envoi du RFID par 'le prox n roll'
-            if rfidcar and rfidcar != 'FINSEQ':
-       	        liste_rfidcar.append(rfidcar)
-     	    if rfidcar == 'FINSEQ':
-                rfid = "".join(liste_rfidcar)  
-     	        if len(liste_rfidcar) >= 1:
-     	            storeRfid(rfid)
-     	        liste_rfidcar=list()
+            data = categorize(event)
+            if data.keystate == 1:
+               key_lookup = ecodes.KEY.get(data.scancode)
+               if key_lookup != "KEY_LEFTSHIFT":
+                  rfidcar=getAccessId(key_lookup)
+                  # Rupture sur une la touche ENTER et le code 28 qui caracterise la fin de l'envoi du RFID par 'le prox n roll'
+                  if rfidcar and rfidcar != 'FINSEQ':
+       	              liste_rfidcar.append(rfidcar)
+     	          if rfidcar == 'FINSEQ':
+                      rfid = "".join(liste_rfidcar)  
+     	              if len(liste_rfidcar) >= 1:
+     	                 storeRfid(rfid)
+     	              liste_rfidcar=list()
