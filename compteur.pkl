@@ -4,5 +4,5 @@ p2
 I1
 sS'compteur'
 p3
-I4
+I8
 s.
