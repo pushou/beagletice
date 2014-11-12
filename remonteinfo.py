@@ -38,7 +38,6 @@ def readLikeEvents():
     req="SELECT * FROM RfidTrace where traite={} and etat={}".format(0,1)
     return execSql(req)
 
-
 def readMeetEvents():
     req="SELECT compteur,GROUP_CONCAT(DISTINCT Rfid),etat,traite as Rfidlist FROM RfidTrace \
 where traite={} and etat={}  GROUP BY compteur".format(0,2)
@@ -81,6 +80,7 @@ if __name__ == "__main__":
     for here_event in readHereEvents():
 	print(here_event)
     print('#' * 50)
+
     print("like events")
     for like_event in readLikeEvents() :
 	print(like_event)
@@ -90,10 +90,11 @@ if __name__ == "__main__":
     for meet_event in readMeetEvents():
 	print(meet_event)
     print('#' * 50)
-    print("all events")
-    for all_event in readAllEvents() :
-	print(all_event)
-    print('#' * 50)
+
+    #print("all events")
+    #for all_event in readAllEvents() :
+    #	print(all_event)
+    #print('#' * 50)
 
     dateheure=now_paris.strftime(fmt)
     #remonteVersTiceServer('php prod/test.php False;echo $?',rsakey,readHereEvents())
