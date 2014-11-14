@@ -1,2 +1,17 @@
 [bb]
-bb1 ansible_ssh_host=192.168.7.2
+bb1  ansible_ssh_host=192.168.7.2
+bb01 ansible_ssh_host=194.199.227.111 ansible_ssh_port=2201
+bb02 ansible_ssh_host=194.199.227.111 ansible_ssh_port=2202
+bb03 ansible_ssh_host=194.199.227.111 ansible_ssh_port=2203
+bb04 ansible_ssh_host=194.199.227.111 ansible_ssh_port=2204
+bb05 ansible_ssh_host=194.199.227.111 ansible_ssh_port=2205
+bb06 ansible_ssh_host=194.199.227.111 ansible_ssh_port=2206
+bb07 ansible_ssh_host=194.199.227.111 ansible_ssh_port=2207
+bb08 ansible_ssh_host=194.199.227.111 ansible_ssh_port=2208
+bb09 ansible_ssh_host=194.199.227.111 ansible_ssh_port=2209
+bb10 ansible_ssh_host=194.199.227.111 ansible_ssh_port=2210
+bb11 ansible_ssh_host=194.199.227.111 ansible_ssh_port=2211
+bb12 ansible_ssh_host=194.199.227.111 ansible_ssh_port=2212
+bb13 ansible_ssh_host=194.199.227.111 ansible_ssh_port=2213
+bb14 ansible_ssh_host=194.199.227.111 ansible_ssh_port=2214
+bb15 ansible_ssh_host=194.199.227.111 ansible_ssh_port=2215

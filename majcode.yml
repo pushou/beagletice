@@ -1,0 +1,17 @@
+---
+- hosts: bb
+  remote_user: root
+  sudo: yes
+  gather_facts: no
+
+  tasks:
+
+    - name: maj 2 code Python 
+      action: repo=https://github.com/pushou/beagletice dst=/home/pouchou/beagletice
+      tags: codepython
+
+    - name: systemctl restart circus.service
+      command: systemctl restart circus.service 
+      tags: systemd
+
+
