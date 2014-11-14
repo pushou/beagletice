@@ -1,5 +1,5 @@
 ---
-- hosts: bb
+- hosts: bb06
   remote_user: root
   sudo: yes
   gather_facts: no
@@ -7,7 +7,8 @@
   tasks:
 
     - name: maj 2 code Python 
-      action: repo=https://github.com/pushou/beagletice dst=/home/pouchou/beagletice
+      #git: repo=ssh://git@github.com/pushou/beagletice.git dest=/home/pouchou/beagletice accept_hostkey=True 
+      git: repo=https://github.com/pushou/beagletice.git dest=/home/pouchou/beagletice  
       tags: codepython
 
     - name: systemctl restart circus.service
