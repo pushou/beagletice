@@ -1,10 +1,16 @@
 ---
-- hosts: bb06
+- hosts: bb1
   remote_user: root
   sudo: yes
   gather_facts: no
 
   tasks:
+
+    - name: rajoute dans /etc/hosts adresse de github
+      lineinfile: dest=/etc/hosts regexp='^192.30.252.129' line='192.30.252.129 github.com' owner=root group=root mode=0644
+
+    - name: rajoute dans /etc/hosts adresse de mytice.conf.org
+      lineinfile: dest=/etc/hosts regexp='^194.199.227.133' line='194.199.227.133 my.ticeconf.org' owner=root group=root mode=0644
 
     - name: maj 2 code Python 
       #git: repo=ssh://git@github.com/pushou/beagletice.git dest=/home/pouchou/beagletice accept_hostkey=True 

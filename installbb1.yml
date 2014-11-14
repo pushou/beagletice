@@ -14,6 +14,12 @@
     - name: set /etc/hostname
       template: src=./beagletice/hostname dest=/etc/hostname
       tags: hostname
+    
+    - name: rajoute dans /etc/hosts adresse de github
+      lineinfile: dest=/etc/hosts regexp='^192.30.252.129' line='192.30.252.129 github.com' owner=root group=root mode=0644 
+
+    - name: rajoute dans /etc/hosts adresse de mytice.conf.org
+      lineinfile: dest=/etc/hosts regexp='^194.199.227.133' line='194.199.227.133 my.ticeconf.org' owner=root group=root mode=0644
 
     - name: copy /etc/init.d/led_aging.sh
       copy: src=./beagletice/led_aging.sh dest=/etc/init.d/led_aging.sh owner=root group=root mode=0755
