@@ -14,7 +14,7 @@ from pytz import timezone
 
 def execSql(reqsql):
     try:
-    	database = 'rfid.db'
+    	database = '/home/pouchou/beagletice/rfid.db'
     	conn = lite.connect(database)
 	conn.row_factory = lite.Row
         cur = conn.cursor()

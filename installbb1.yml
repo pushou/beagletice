@@ -1,13 +1,13 @@
 ---
-- hosts: bb2
+- hosts: bb01
   remote_user: root
   sudo: yes
   gather_facts: no
   vars:
    locale: fr_FR.UTF-8
    timezone: Europe/Paris
-   hostname: bb2
-   ipaddr: 172.31.128.2
+   hostname: bb03
+   ipaddr: 172.31.128.3
 
   tasks:
 
@@ -128,7 +128,7 @@
       tags: timezone
 
     - name: cron du push vers TICE
-      cron: name="push vers TICE"  minute="*/3"   job="/home/bin/beagletice/remonteinfo.py 2>&1 > /dev/null"
+      cron: name="push vers TICE"  minute="*/3"   job="/usr/bin/python /home/bin/beagletice/remonteinfo.py 2>&1 > /dev/null"
       tags: cron
 
   handlers:

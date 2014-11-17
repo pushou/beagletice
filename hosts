@@ -1,5 +1,5 @@
 [bb]
-bb1  ansible_ssh_host=192.168.7.2
+#bb1  ansible_ssh_host=192.168.7.2
 bb01 ansible_ssh_host=194.199.227.111 ansible_ssh_port=2201
 bb02 ansible_ssh_host=194.199.227.111 ansible_ssh_port=2202
 bb03 ansible_ssh_host=194.199.227.111 ansible_ssh_port=2203
