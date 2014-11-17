@@ -56,6 +56,7 @@
        - check-mk-agent
        - memcached
        - python-memcache
+       - xinetd
       tags: sysnmod
 
     - name: sed 
