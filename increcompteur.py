@@ -83,6 +83,7 @@ try:
         old_switch_state_13 = new_switch_state_13
 
 	if shared.get('eteint'):
+            compteur+=1
             eteintLed()
             shared.set('eteint', False)
             etat=0
