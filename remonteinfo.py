@@ -10,6 +10,7 @@ import sqlite3 as lite
 import paramiko
 import sys
 from pytz import timezone
+import logging
 
 
 def execSql(reqsql):
@@ -48,6 +49,7 @@ def readEvent(rfid):
     return execSql(req)
     
 def modifyEvent(rfid):
+    print(rfid)
     req="UPDATE RfidTrace SET traite={} where Rfid='{}'".format(1,unicode(rfid))
     return execSql(req)
 
@@ -59,7 +61,7 @@ def remonteVersTiceServer(action):
     print("connecting")
     ssh.connect(hostname = ticeserver, username = username, pkey = key)
     stdin, stdout, stderr = ssh.exec_command(action)
-    #stdin.flush()
+    stdin.flush()
     #data = stdout.read.splitlines()
     print(stdout.readlines())
  
@@ -67,6 +69,7 @@ def remonteVersTiceServer(action):
 
 if __name__ == "__main__":
 
+    #logging.basicConfig(level=logging.DEBUG)
     rsakey='/home/pouchou/id_rsa.conftice'
     ticeserver='my.ticeconf.org'
     username='beagle'
@@ -103,12 +106,12 @@ if __name__ == "__main__":
         #print(group_of_meetrfids[1])
         #print('%' * 50)
         rfidlist = ' '.join(group_of_meetrfids[1].split(','))
-        #print(rfidlist)
         pushcommand="php prod/link.php {} {} ".format(dateheure,rfidlist)
         print(pushcommand)
         remonteVersTiceServer(pushcommand)
-        for rfid in group_of_meetrfids:
-            print(rfid)
+        listofrfid=rfidlist.split()  
+        for rfid in listofrfid:
+            modifyEvent(rfid)
     
        
     for group_of_likerfids in readLikeEvents():
