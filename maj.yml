@@ -1,0 +1,18 @@
+---
+- hosts: bb
+  remote_user: root
+  sudo: yes
+  gather_facts: no
+  vars:
+   locale: fr_FR.UTF-8
+   timezone: Europe/Paris
+
+  tasks:
+
+    - name: Deploiement du code Python 
+      action: git repo=https://github.com/pushou/beagletice.git dest=/home/bin/beagletice
+      tags: codepython
+
+    - name: restart circus
+      command: systemctl restart circus.service
+      tags: systemd
