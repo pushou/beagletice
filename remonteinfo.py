@@ -9,9 +9,14 @@ from datetime import datetime
 import sqlite3 as lite
 import paramiko
 import sys
-from pytz import timezone 
+import time
+from pytz import timezone,utc 
 import logging
 
+def utc_to_local(utc_dt):
+    local_tz = timezone('Europe/Paris')
+    local_dt = utc_dt.replace(tzinfo=utc).astimezone(local_tz)
+    return local_tz.normalize(local_dt) # .normalize might be unnecessary
 
 def execSql(reqsql):
     try:
@@ -52,13 +57,13 @@ def readEvent(rfid):
 def getDateEvent(id):
     req="SELECT eventdate FROM RfidTrace where id='{}'".format(id)
     dateevent=execSql(req)	
-    print(dateevent)
     dateevent=datetime.strptime(dateevent[0][0].split('.')[0],"%Y-%m-%d %H:%M:%S")
-    paris=timezone('Europe/Paris')
-    dateevent = paris.localize(dateevent)
-    print('r'*50)
     print(dateevent)
-    return dateevent
+    fmt="%Y-%m-%dT%H:%M:%S"
+    lt=utc_to_local(dateevent).strftime(fmt)
+    print(lt)
+    print('r'*50)
+    return lt
     
 def modifyEvent(rfid):
     print(rfid)
