@@ -9,14 +9,14 @@ from datetime import datetime
 import sqlite3 as lite
 import paramiko
 import sys
-from pytz import timezone
+from pytz import timezone 
 import logging
 
 
 def execSql(reqsql):
     try:
-    	#database = '/home/bin/beagletice/rfid.db'
-    	database = 'rfid.db'
+    	database = '/home/bin/beagletice/rfid.db'
+    	#database = 'rfid.db'
     	conn = lite.connect(database)
 	conn.row_factory = lite.Row
         cur = conn.cursor()
@@ -49,11 +49,13 @@ def readEvent(rfid):
     req="SELECT * FROM RfidTrace  where traite=0 and rfid={}".format(rfid)
     return execSql(req)
 
-def getDateEvent(rfid):
-    req="SELECT eventdate FROM RfidTrace where rfid='{}'".format(rfid)
-    dateevent=execSql(req)[0][0].replace(" ",'T')	
-    dateevent=dateevent.split('.')
-    dateevent=dateevent[0][:-2] + "01+0100"
+def getDateEvent(id):
+    req="SELECT eventdate FROM RfidTrace where id='{}'".format(id)
+    dateevent=execSql(req)	
+    print(dateevent)
+    dateevent=datetime.strptime(dateevent[0][0].split('.')[0],"%Y-%m-%d %H:%M:%S")
+    paris=timezone('Europe/Paris')
+    dateevent = paris.localize(dateevent)
     print('r'*50)
     print(dateevent)
     return dateevent
@@ -109,8 +111,8 @@ if __name__ == "__main__":
     #	print(all_event)
     #print('#' * 50)
 
-    offdateheure=now_paris.strftime(fmt)
-    print(offdateheure)
+    dateheure=now_paris.strftime(fmt)
+    print(dateheure)
     #remonteVersTiceServer('php prod/test.php False;echo $?',rsakey,readHereEvents())
     #remonteVersTiceServer('php prod/test.php True;echo $?',rsakey,readHereEvents())
     for group_of_meetrfids in readMeetEvents():
@@ -118,7 +120,7 @@ if __name__ == "__main__":
         #print('%' * 50)
         rfidlist = ' '.join(group_of_meetrfids[1].split(','))
         listofrfid=rfidlist.split()  
-        dateheure=getDateEvent(listofrfid[0])
+        #dateheure=getDateEvent(listofrfid[0])
         pushcommand="php prod/link.php {} {} ".format(dateheure,rfidlist)
         print(pushcommand)
         remonteVersTiceServer(pushcommand)
@@ -131,7 +133,7 @@ if __name__ == "__main__":
         machine=group_of_likerfids[2]
         rfid=group_of_likerfids[3]
         print(machine,rfid)
-        dateheure=getDateEvent(rfid)
+        #dateheure=getDateEvent(rfid)
         pushcommand="php prod/join-like.php like {} {} {} ".format(dateheure,machine,rfid)
         print(pushcommand)
         remonteVersTiceServer(pushcommand)
@@ -140,9 +142,10 @@ if __name__ == "__main__":
     for group_of_hererfids in readHereEvents():
         group_of_hererfids=list(group_of_hererfids)
         machine=group_of_hererfids[2]
+        id=group_of_hererfids[0]
         rfid=group_of_hererfids[3]
-        #print(machine,rfid)
-        dateheure=getDateEvent(rfid)
+        print("id: {}".format(id))
+        dateheure=getDateEvent(id)
         pushcommand="php prod/join-like.php join {} {} {} ".format(dateheure,machine,rfid)
         print(pushcommand)
         remonteVersTiceServer(pushcommand)
